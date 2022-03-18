@@ -15,23 +15,13 @@ public class Main {
 
 	public static void main(String[] args) {
 
-		//Display input details for the user
-		System.out.println("Enter your moves in the form \"startRow,startColumn;endRow,endColumn\" "
-							+ "OR"
-							+"Enter your moves in the form \"xStart,yStsart;xEnd,yEnd\" "
-							+ "where bottom left is (0,0)" 
-							);
+		// Create red and white player				
+		Player redPlayer = new Player("red", CellElements.RED);
+		Player whitePlayer = new Player("white", CellElements.WHITE);
 
-
-
-		String redName = "red";
-		String whiteName = "white";
-		// Create the two players for this board.
-		Player redPlayer = new Player(redName, TileState.RED);
-		Player whitePlayer = new Player(whiteName, TileState.WHITE);
-
-		// Create and display the game board.
+		// Create and display the checkers board.
 		Board board = new Board(redPlayer, whitePlayer);
+		board.displayInputDetails();
 		board.displayBoard();
 
 		// Begin prompting players for moves until the game ends.
@@ -40,8 +30,5 @@ public class Main {
 			board.promptPlayerMove(scanner);
 			board.displayBoard();
 		}
-
-		// Close resources.
-		//scanner.close();
 	}
 }
