@@ -1,4 +1,4 @@
-package us.rockhopper.tim.checkers;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,14 +76,16 @@ public class Board {
 	}
 
 	public void displayBoard() {
-		for (int h = 0; h < BOARD_HEIGHT; ++h) {
-			System.out.print("|");
-			for (int w = 0; w < BOARD_WIDTH; ++w) {
-				TileState tile = BOARD_STATE[w][h];
+		for (int i = 0; i <= BOARD_HEIGHT-1; i++) {
+		    
+			System.out.print(BOARD_HEIGHT - i -1  + " " +  "|");
+			for (int j = 0; j <= BOARD_WIDTH-1; j++) {
+				TileState tile = BOARD_STATE[j][i];
 				System.out.print(tile.getSymbol() + "|");
 			}
 			System.out.print("\n");
 		}
+		System.out.println("   0 1 2 3 4 5 6 7");
 	}
 
 	public boolean isGameRunning() {

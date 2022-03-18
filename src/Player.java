@@ -1,4 +1,4 @@
-package us.rockhopper.tim.checkers;
+
 
 /**
  * Specifies a player of this game, which just has a name and a color right now.

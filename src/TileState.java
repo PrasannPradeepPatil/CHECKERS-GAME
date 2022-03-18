@@ -1,4 +1,4 @@
-package us.rockhopper.tim.checkers;
+
 
 /**
  * Represents the state of any given cell on the checkers board: what color

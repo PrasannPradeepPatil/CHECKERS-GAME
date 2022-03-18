@@ -1,13 +1,3 @@
-package us.rockhopper.tim.checkers;
-
-/**
- * This class is just a holder of data specifying the characteristics for a
- * given checker piece's jump.
- * 
- * @author Tim Clancy
- * @version 1.0.0
- * @date 10.5.2017
- */
 public class Move {
 
 	public int fromX;
