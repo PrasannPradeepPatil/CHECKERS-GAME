@@ -1,82 +1,27 @@
 
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 
-/**
- * This class contains the state of the checkers board, as well as methods for
- * taking player input to simulate moves.
- * 
- * @author Tim Clancy
- * @version 1.0.0
- * @date 10.5.2017
- */
 public class Board {
 
 
 	
 	private final int totalColumns = 8;
 	private final int totalRows = 8;
-	private final CellElements[][] board ;
+	private final CellState[][] board ;
 
 	private final Player[] players;
 	private final List<PlayerMove> currentPlayerMoves;
-	private List<Integer[]> JUMPERS = new ArrayList<>();
+	private List<int[]> availableJumpPositions = new ArrayList<>();
 	private int currentPlayerIndex = 0;
 
 	public Board(final Player red, final Player white) {
-		board = new CellElements[totalColumns][totalRows];
+		board = new CellState[totalColumns][totalRows];
 		players = new Player[2];
 		players[0] = red;
 		players[1] = white;
 		currentPlayerMoves = new ArrayList<PlayerMove>();
 		resetBoard();
-	}
-
-	private void resetBoard() {
-		for(int i=0 ; i <=totalRows -1;i++){
-			for(int j=0 ; j <= totalColumns-1;j++){
-				if(i == 0 || i == 2){
-					if(j%2 != 0){
-						board[j][i] = CellElements.WHITE;
-					}
-					else{
-						board[j][i] = CellElements.EMPTY;
-					}
-				}
-			    else if(i == 1){
-					if(j%2 == 0){
-						board[j][i] = CellElements.WHITE;
-					}
-					else{
-						board[j][i] = CellElements.EMPTY;
-					}
-				}
-				else if(i == 3 || i == 4){
-					board[j][i]  = CellElements.EMPTY;
-				}
-				else if(i == 5 || i == 7){
-					if(j %2 == 0){
-						board[j][i] = CellElements.RED;
-					}
-					else{
-						board[j][i] = CellElements.EMPTY;
-					}
-				}
-			    else if(i == 6){
-					if(j %2 != 0){
-						board[j][i] = CellElements.RED;
-					}
-					else{
-						board[j][i] = CellElements.EMPTY;
-					}
-				}
-			
-			
-			}
-		}	
 	}
 
 	public void displayInputDetails(){
@@ -87,12 +32,56 @@ public class Board {
 							);
 	}
 
+	private void resetBoard() {
+		for(int i=0 ; i <=totalRows -1;i++){
+			for(int j=0 ; j <= totalColumns-1;j++){
+				if(i == 0 || i == 2){
+					if(j%2 != 0){
+						board[j][i] = CellState.WHITE;
+					}
+					else{
+						board[j][i] = CellState.EMPTY;
+					}
+				}
+			    else if(i == 1){
+					if(j%2 == 0){
+						board[j][i] = CellState.WHITE;
+					}
+					else{
+						board[j][i] = CellState.EMPTY;
+					}
+				}
+				else if(i == 3 || i == 4){
+					board[j][i]  = CellState.EMPTY;
+				}
+				else if(i == 5 || i == 7){
+					if(j %2 == 0){
+						board[j][i] = CellState.RED;
+					}
+					else{
+						board[j][i] = CellState.EMPTY;
+					}
+				}
+			    else if(i == 6){
+					if(j %2 != 0){
+						board[j][i] = CellState.RED;
+					}
+					else{
+						board[j][i] = CellState.EMPTY;
+					}
+				}
+			
+			
+			}
+		}	
+	}
+	
 	public void displayBoard() {
 		for (int i = 0; i <= totalRows-1; i++) {
 		    
 			System.out.print(totalRows - i -1  + " " +  "|");
 			for (int j = 0; j <= totalColumns-1; j++) {
-				CellElements tile = board[j][i];
+				CellState tile = board[j][i];
 				System.out.print(tile.getSymbol() + "|");
 			}
 			System.out.print("\n");
@@ -100,257 +89,146 @@ public class Board {
 		System.out.println("   0 1 2 3 4 5 6 7");
 	}
 
-
-	public void promptPlayerMove(Scanner prompt) {
+	public void currentPlayerMoveDetails() {
+	
+		Scanner sc = new Scanner(System.in);
 
 		// Tell the players who we're asking input from.
 		Player currentPlayer = players[currentPlayerIndex];
-		CellElements playerColor = currentPlayer.getColor();
+		CellState currentPlayerColour = currentPlayer.getColor();
 		String currentPlayerName = currentPlayer.getName();
-		System.out.println("It is " + currentPlayer.getName()
-				+ "'s turn. Please specify a move: ");
+		System.out.println("Please input " + currentPlayer.getName()+ "'s move");
 
-		// If the player has a piece that can jump, they must choose
-		// that piece. Find all of the player's pieces which have
-		// eligible jumps.
-		JUMPERS.clear();
-		for (int w = 0; w < totalColumns; ++w) {
-			for (int h = 0; h < totalRows; ++h) {
-				CellElements tile = board[w][h];
-				if (playerColor == tile) {
-					boolean canJump = this.canPieceJump(w, 7 - h);
-					if (canJump) {
-						Integer[] jumpPosition = new Integer[2];
-						jumpPosition[0] = w;
-						jumpPosition[1] = (7 - h);
-						JUMPERS.add(jumpPosition);
+
+		//For all of the current players peice find all peices which have valid jumps(if a peice can jump it has to jump)
+		availableJumpPositions.clear();
+		for (int i = 0; i <= totalColumns-1; i++) {
+			for (int j = 0; j <= totalRows-1; j++) {
+				CellState cellColour = board[i][j];
+				if (currentPlayerColour == cellColour) {
+					boolean currentPeiceCanJump = this.currentPeiceCanJump(i, 7 - j);
+					if (currentPeiceCanJump) {
+						availableJumpPositions.add(new int[]{i,7-j});
 					}
 				}
 			}
 		}
 
-		// Keep asking the player to make moves until they run out of follow-up
-		// moves (more jumps in the series).
-		boolean hasMoves = true;
-		while (hasMoves) {
-
-			// Keep asking this player for input until they've given us an
-			// answer which represents a valid move.
-			String moveString = prompt.nextLine();
-			Optional<PlayerMove> moveOption = parseValidMove(moveString);
+		//while the current player has valid moves 
+		boolean currentPlayerHasValidMoves = true;
+		while (currentPlayerHasValidMoves) {
+			//Keep asking till user enters a valid move 
+			String moveInput = sc.nextLine();
+			Optional<PlayerMove> moveOption = parseValidMove(moveInput);
 			while (!moveOption.isPresent()) {
-				System.out.println("Please enter a valid move, "
-						+ currentPlayerName + ": ");
-				moveString = prompt.nextLine();
-				moveOption = parseValidMove(moveString);
+				System.out.println("Please enter a valid move, "+ currentPlayerName + ": ");
+				moveInput = sc.nextLine();
+				moveOption = parseValidMove(moveInput);
 			}
-			PlayerMove validMove = moveOption.get();
+			PlayerMove moveValid = moveOption.get();
 
-			// Execute the player's move.
-			executeMove(validMove);
+			// Execute valid move 
+			currentMoveExecute(moveValid);
 
-			// Check if this player still has follow-up moves.
-			hasMoves = hasFollowUpMoves(validMove);
+			// Check if the valid move has follow up valid moves.
+			currentPlayerHasValidMoves = currentMoveHasFollowUpMoves(moveValid);
 
 			// If the player still has moves, tell them.
-			if (hasMoves) {
+			if (currentPlayerHasValidMoves) {
 				System.out.println();
-				System.out.println("Continue, " + currentPlayerName);
+				System.out.println(currentPlayerName + "still has valid move so its" + currentPlayerName + "'s turn again");
 			}
 		}
 
-		// Pass control of next turn to the other player.
-		swapPlayerIndex();
-		currentPlayerMoves.clear();
-	}
-
-	private void swapPlayerIndex() {
+		// swap the player
 		currentPlayerIndex = (currentPlayerIndex == 1)?0:1;
+		currentPlayerMoves.clear();
+
+	
 	}
+	
+	private Optional<PlayerMove> parseValidMove(String moveString) {
 
-	private boolean hasFollowUpMoves(PlayerMove move) {
+		//Split iput on ";" and check if there are 2 splits
+		String[] movesList = moveString.split(";");
+		if (movesList.length != 2) {return Optional.empty();}
 
-		// If this piece just playerJumped it might have follow-up jumps.
-		if (move.playerJumped) {
+		//Split the moveList on "," and check if there are 2 splits 
+		String[] startPosition = (movesList[0]).split(",");
+		String[] endPosition = (movesList[1]).split(",");
+		if (startPosition.length != 2 || endPosition.length != 2) {return Optional.empty();}
 
-			// Find the two possible locations this piece could still jump to.
-			Player currentPlayer = players[currentPlayerIndex];
-			CellElements playerColor = currentPlayer.getColor();
-			int directionModifier = 0;
-			if (playerColor == CellElements.RED) {
-				directionModifier = 1;
-			} else {
-				directionModifier = -1;
-			}
-
-			int endX = move.endX;
-			int endY = move.endY;
-			int targetOneX = endX - 2;
-			int targetTwoX = endX + 2;
-			int targetY = endY + (2 * directionModifier);
-			String targetOne = endX + "," + endY + ";" + targetOneX + ","
-					+ targetY;
-			String targetTwo = endX + "," + endY + ";" + targetTwoX + ","
-					+ targetY;
-			Optional<PlayerMove> targetOneOption = parseValidMove(targetOne);
-			Optional<PlayerMove> targetTwoOption = parseValidMove(targetTwo);
-
-			boolean availableMoves = false;
-			if (targetOneOption.isPresent()) {
-				currentPlayerMoves.add(targetOneOption.get());
-				availableMoves = true;
-			}
-			if (targetTwoOption.isPresent()) {
-				currentPlayerMoves.add(targetTwoOption.get());
-				availableMoves = true;
-			}
-			return availableMoves;
-		}
-
-		return false;
-	}
-
-	protected void executeMove(PlayerMove move) {
-		int startX = move.startX;
-		int startY = move.startY;
-		int endX = move.endX;
-		int endY = move.endY;
-
-		// Move the piece to its new location.
-		CellElements piece = board[startX][(totalRows - 1) - startY];
-		this.board[endX][(totalRows - 1) - endY] = piece;
-		this.board[startX][(totalRows - 1) - startY] = CellElements.EMPTY;
-
-		// Remove whatever piece it might have killed.
-		boolean playerJumped = move.playerJumped;
-		if (playerJumped) {
-			int capturedX = move.capturedX;
-			int capturedY = move.capturedY;
-			this.board[capturedX][(totalRows - 1)
-					- capturedY] = CellElements.EMPTY;
-		}
-	}
-
-	// Checks whether or not the piece at position x,y can jump.
-	private boolean canPieceJump(int pieceX, int pieceY) {
-
-		Player currentPlayer = players[currentPlayerIndex];
-		CellElements playerColor = currentPlayer.getColor();
-		int directionModifier = 0;
-		if (playerColor == CellElements.RED) {
-			directionModifier = 1;
-		} else {
-			directionModifier = -1;
-		}
-
-		int targetOneX = pieceX - 2;
-		int targetTwoX = pieceX + 2;
-		int targetY = pieceY + (2 * directionModifier);
-		String targetOne = pieceX + "," + pieceY + ";" + targetOneX + ","
-				+ targetY;
-		String targetTwo = pieceX + "," + pieceY + ";" + targetTwoX + ","
-				+ targetY;
-		Optional<PlayerMove> targetOneOption = parseValidMove(targetOne);
-		Optional<PlayerMove> targetTwoOption = parseValidMove(targetTwo);
-
-		return (targetOneOption.isPresent() || targetTwoOption.isPresent());
-	}
-
-	protected Optional<PlayerMove> parseValidMove(String moveString) {
-
-		// Check if the input can split into two cells.
-		String[] splitMove = moveString.split(";");
-		if (splitMove.length != 2) {
-			return Optional.empty();
-		}
-
-		// Check if the two cells can split into two coordinates.
-		String[] cellFrom = (splitMove[0]).split(",");
-		String[] cellTo = (splitMove[1]).split(",");
-		if (cellFrom.length != 2 || cellTo.length != 2) {
-			return Optional.empty();
-		}
-
-		// Check if the cell coordinates can be properly parsed.
+		//Check cell co-ordinates
 		try {
-			int startX = Integer.parseInt(cellFrom[0]);
-			int startY = Integer.parseInt(cellFrom[1]);
-			int endX = Integer.parseInt(cellTo[0]);
-			int endY = Integer.parseInt(cellTo[1]);
+			int sourceX = Integer.parseInt(startPosition[0]);
+			int sourceY = Integer.parseInt(startPosition[1]);
+			int destinationX = Integer.parseInt(endPosition[0]);
+			int destinationY = Integer.parseInt(endPosition[1]);
 
 			Player currentPlayer = players[currentPlayerIndex];
-			CellElements playerColor = currentPlayer.getColor();
+			CellState currentPlayerColour = currentPlayer.getColor();
 
-			// Check to see if these coordinates are valid on the board.
-			if (startX >= 0 && startX <= 7 && startY >= 0 && startY <= 7 && endX >= 0
-					&& endX <= 7 && endY >= 0 && endY <= 7) {
+			//Check cell co-ordinates are in board's range
+			if (sourceX >= 0 && sourceX <= 7 && sourceY >= 0 && sourceY <= 7 && destinationX >= 0 && destinationX <= 7 && destinationY >= 0 && destinationY <= 7) {
 
-				// Prevent the user from moving from and to the same tile.
-				if (startX != endX && startY != endY) {
+				//Check cell co-ordinates start and end are not same ie check if user doesnt move from and to same tile
+				if (sourceX != destinationX && sourceY != destinationY) {
 
-					// Make sure this player is trying to move their own piece.
-					// The offset value is to translate the origin for the
-					// players. They would expect 0,0 to be bottom-left.
-					CellElements movingPiece = board[startX][(totalRows
-							- 1) - startY];
-					if (playerColor != movingPiece) {
-						return Optional.empty();
-					}
+	
+					//Check if the moving peice and current player peice is the same
+					CellState movingPieceColour = board[sourceX][(totalRows- 1) - sourceY];
+					if (currentPlayerColour != movingPieceColour) {return Optional.empty();}
 
-					// Make sure this player is trying to move to an empty spot.
-					CellElements destination = board[endX][(totalRows - 1)
-							- endY];
-					if (destination != CellElements.EMPTY) {
-						return Optional.empty();
-					}
+					//check is player moves on empty slot
+					CellState destinationColour = board[destinationX][(totalRows - 1)- destinationY];
+					if (destinationColour != CellState.EMPTY) {return Optional.empty();}
 
-					// Figure out what direction this player is allowed to move
-					// in. RED moves up the board, WHITE moves down it.
-					int directionModifier = 0;
-					if (playerColor == CellElements.RED) {
-						directionModifier = 1;
-					} else {
-						directionModifier = -1;
-					}
+					//Decide the direction Choice
+					//RED moves up the board hence +1 , WHITE moves down it hence -1.
+					int directionChoice = 0;
+					if (currentPlayerColour == CellState.RED) {directionChoice = 1;} 
+					else {directionChoice = -1;}
 
 					// Figure out if this move is valid for distance reasons.
-					// This restricts each piece to its four valid destinations.
-					int xDist = Math.abs(startX - endX);
+					// This restricts each piece to its four valid destinationColours.
+					int xDist = Math.abs(sourceX - destinationX);
 					int expectedY;
 					boolean isJump = false;
 					if (xDist == 1) {
-						expectedY = startY + directionModifier;
-					} else if (xDist == 2) {
+						expectedY = sourceY + directionChoice;
+					}
+					 else if (xDist == 2) {
 						isJump = true;
-						expectedY = startY + (2 * directionModifier);
-					} else {
+						expectedY = sourceY + (2 * directionChoice);
+					} 
+					else {
 						return Optional.empty();
 					}
 
 					// Make sure we moved in the right direction.
-					if (expectedY != endY) {
+					if (expectedY != destinationY) {
 						return Optional.empty();
 					}
 
 					// If this is a jump, make sure we actually playerJumped over an
 					// opponent's piece.
-					PlayerMove validMove = new PlayerMove(startX, startY, endX, endY);
+					PlayerMove validMove = new PlayerMove(sourceX, sourceY, destinationX, destinationY);
 					if (isJump) {
-						int opponentY = (expectedY - directionModifier);
+						int opponentY = (expectedY - directionChoice);
 						int opponentX;
-						if (startX > endX) {
-							opponentX = startX - 1;
+						if (sourceX > destinationX) {
+							opponentX = sourceX - 1;
 						} else {
-							opponentX = startX + 1;
+							opponentX = sourceX + 1;
 						}
 
 						// Actually perform the check to see opponent state.
-						CellElements opponentPiece = board[opponentX][(totalRows
+						CellState opponentPiece = board[opponentX][(totalRows
 								- 1) - opponentY];
-						if ((playerColor == CellElements.RED
-								&& opponentPiece != CellElements.WHITE)
-								|| (playerColor == CellElements.WHITE
-										&& opponentPiece != CellElements.RED)) {
+						if ((currentPlayerColour == CellState.RED
+								&& opponentPiece != CellState.WHITE)
+								|| (currentPlayerColour == CellState.WHITE
+										&& opponentPiece != CellState.RED)) {
 							return Optional.empty();
 						} else {
 							validMove.capturedX = opponentX;
@@ -365,9 +243,9 @@ public class Board {
 					// restrict their valid moves in this case.
 					boolean isValidOption = false;
 					for (PlayerMove m : currentPlayerMoves) {
-						int mX = m.endX;
-						int mY = m.endY;
-						if (endX == mX && endY == mY) {
+						int mX = m.destinationX;
+						int mY = m.destinationY;
+						if (destinationX == mX && destinationY == mY) {
 							isValidOption = true;
 							break;
 						}
@@ -375,12 +253,12 @@ public class Board {
 
 					// If we found jump-capable pieces, is this one?
 					// And did it jump?
-					if (JUMPERS.size() > 0) {
+					if (availableJumpPositions.size() > 0) {
 						boolean wasJumper = false;
-						for (Integer[] position : JUMPERS) {
+						for (int[] position : availableJumpPositions) {
 							int posX = position[0];
 							int posY = position[1];
-							if (posX == startX && posY == startY) {
+							if (posX == sourceX && posY == sourceY) {
 								wasJumper = true;
 								break;
 							}
@@ -411,6 +289,93 @@ public class Board {
 		return Optional.empty();
 	}
 
+	private boolean currentMoveHasFollowUpMoves(PlayerMove move) {
+
+		// If this piece just playerJumped it might have follow-up jumps.
+		if (move.playerJumped) {
+
+			// Find the two possible locations this piece could still jump to.
+			Player currentPlayer = players[currentPlayerIndex];
+			CellState currentPlayerColour = currentPlayer.getColor();
+
+			//Decide the direction Choice
+			//RED moves up the board hence +1 , WHITE moves down it hence -1.
+			int directionChoice = 0;
+			if (currentPlayerColour == CellState.RED) {directionChoice = 1;} 
+			else {directionChoice = -1;}
+
+			//Decide the 2 destination moves
+			int destinationX = move.destinationX;
+			int destinationY = move.destinationY;
+			int destinationX_1 = destinationX - 2;
+			int destinationX_2 = destinationX + 2;
+			int destinationY_1 = destinationY + (2 * directionChoice);
+			String destination_1 = destinationX + "," + destinationY + ";" + destinationX_1 + ","+ destinationY_1;
+			String destination_2 = destinationX + "," + destinationY + ";" + destinationX_2 + ","+ destinationY_1;
+			Optional<PlayerMove> destination_1_Move = parseValidMove(destination_1);
+			Optional<PlayerMove> destination_2_Move = parseValidMove(destination_2);
+
+			boolean availableMoves = false;
+			if (destination_1_Move.isPresent()) {
+				currentPlayerMoves.add(destination_1_Move.get());
+				availableMoves = true;
+			}
+			if (destination_2_Move.isPresent()) {
+				currentPlayerMoves.add(destination_2_Move.get());
+				availableMoves = true;
+			}
+			return availableMoves;
+		}
+
+		return false;
+	}
+
+	private void currentMoveExecute(PlayerMove move) {
+		int sourceX = move.sourceX;
+		int sourceY = move.sourceY;
+		int destinationX = move.destinationX;
+		int destinationY = move.destinationY;
+
+		// Move peice by changing the co-ordinates of the board
+		CellState piece = board[sourceX][(totalRows - 1) - sourceY];
+		this.board[destinationX][(totalRows - 1) - destinationY] = piece;
+		this.board[sourceX][(totalRows - 1) - sourceY] = CellState.EMPTY;
+
+		// Remove the captures peice when player moves
+		boolean playerJumped = move.playerJumped;
+		if (playerJumped) {
+			int capturedX = move.capturedX;
+			int capturedY = move.capturedY;
+			this.board[capturedX][(totalRows - 1)- capturedY] = CellState.EMPTY;
+		}
+	}
+
+	private boolean currentPeiceCanJump(int pieceX, int pieceY) {
+
+		Player currentPlayer = players[currentPlayerIndex];
+		CellState currentPlayerColour = currentPlayer.getColor();
+
+		//Decide the direction Choice
+		//RED moves up the board hence +1 , WHITE moves down it hence -1.
+		int directionChoice = 0;
+		if (currentPlayerColour == CellState.RED) {directionChoice = 1;}
+		else {directionChoice = -1;}
+
+		int destinationX_1 = pieceX - 2;
+		int destinationX_2 = pieceX + 2;
+		int destinationY_1 = pieceY + (2 * directionChoice);
+		String destination_1 = pieceX + "," + pieceY + ";" + destinationX_1 + ","+ destinationY_1;
+		String destination_2 = pieceX + "," + pieceY + ";" + destinationX_2 + ","+ destinationY_1;
+		Optional<PlayerMove> destination_1_Move = parseValidMove(destination_1);
+		Optional<PlayerMove> destination_2_Move = parseValidMove(destination_2);
+
+		return (destination_1_Move.isPresent() || destination_2_Move.isPresent());
+	}
+
+
+	
+	
+	
 	public boolean isGameRunning() {
 		return true;
 
