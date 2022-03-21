@@ -129,9 +129,6 @@ public class Board {
 
 		int count = 0;
 
-//		int directionModifier = currentPlayer.getColor() == CellElements.RED ? 1 : -1;
-
-
 		for(PiecePosition piecePosition: piecePositionInfoArray[playerNo])
 		{
 			int targetOneX = piecePosition.xCoordinate - 1;
@@ -179,19 +176,24 @@ public class Board {
 		// that piece. Find all of the player's pieces which have
 		// eligible jumps.
 		jumpPositions.clear();
-		for (int w = 0; w < BOARD_WIDTH; ++w) {
-			for (int h = 0; h < BOARD_HEIGHT; ++h) {
-				CellElements tile = BOARD_STATE[w][h];
-				if (playerColor == tile) {
-					boolean canJump = this.canPieceJump(w, 7 - h);
-					if (canJump) {
-						Integer[] jumpPosition = new Integer[2];
-						jumpPosition[0] = w;
-						jumpPosition[1] = (7 - h);
-						jumpPositions.add(jumpPosition);
-					}
-				}
+		int playerNo = 0;
+
+		if(currentPlayer.getColor() == CellElements.RED)
+		{
+			playerNo = 1;
+		}
+
+		for(PiecePosition piecePosition: piecePositionInfoArray[playerNo])
+		{
+			boolean canJump = this.canPieceJump(piecePosition.xCoordinate, piecePosition.yCoordinate);
+			if (canJump)
+			{
+				Integer[] jumpPosition = new Integer[2];
+				jumpPosition[0] = piecePosition.xCoordinate;
+				jumpPosition[1] = piecePosition.yCoordinate;
+				jumpPositions.add(jumpPosition);
 			}
+
 		}
 
 		// Keep asking the player to make moves until they run out of follow-up
@@ -227,6 +229,7 @@ public class Board {
 		// Pass control of next turn to the other player.
 		swapPlayerControl();
 		CURRENT_PLAYER_MOVES.clear();
+		jumpPositions.clear();
 	}
 
 	protected void swapPlayerControl() {
