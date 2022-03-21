@@ -36,7 +36,7 @@ public class Board {
 	}
 
 
-	public boolean isGameRunning() {
+	public boolean isAnyMoveValid() {
 		Player currentPlayer = players[currentPlayerIndex];
 		int playerNo = 0;
 		int directionModifier = -1;
@@ -73,8 +73,8 @@ public class Board {
 			}
 		}
 
-
-		return false;
+        //return false;   
+		return true;
 	}
 
 	private void resetBoard() {
@@ -257,9 +257,7 @@ public class Board {
 					}
 
 					// Make sure we moved in the right direction.
-					if (expectedY != destinationY) {
-						return Optional.empty();
-					}
+					if (expectedY != destinationY) {return Optional.empty();}
 
 					// If this is a jump, make sure we actually playerJumped over an
 					// opponent's piece.
