@@ -1,4 +1,3 @@
-
 public class Player {
 
 	private final String PLAYER_NAME;

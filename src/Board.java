@@ -35,8 +35,50 @@ public class Board {
 		resetGame();
 	}
 
-	// Initialize the checker board to a valid starting state.
+
 	private void resetGame() {
+		// for(int i=0 ; i <=BOARD_HEIGHT -1;i++){
+		// 	for(int j=0 ; j <= BOARD_WIDTH-1;j++){
+		// 		if(i == 0 || i == 2){
+		// 			if(j%2 != 0){
+		// 				BOARD_STATE[i][j] = CellElements.WHITE;
+		// 			}
+		// 			else{
+		// 				BOARD_STATE[i][j] = CellElements.EMPTY;
+		// 			}
+		// 		}
+		// 	    else if(i == 1){
+		// 			if(j%2 == 0){
+		// 				BOARD_STATE[i][j] = CellElements.WHITE;
+		// 			}
+		// 			else{
+		// 				BOARD_STATE[i][j] = CellElements.EMPTY;
+		// 			}
+		// 		}
+		// 		else if(i == 3 || i == 4){
+		// 			BOARD_STATE[i][j]  = CellElements.EMPTY;
+		// 		}
+		// 		else if(i == 5 || i == 7){
+		// 			if(j %2 == 0){
+		// 				BOARD_STATE[i][j] = CellElements.RED;
+		// 			}
+		// 			else{
+		// 				BOARD_STATE[i][j] = CellElements.EMPTY;
+		// 			}
+		// 		}
+		// 	    else if(i == 6){
+		// 			if(j %2 != 0){
+		// 				BOARD_STATE[i][j] = CellElements.RED;
+		// 			}
+		// 			else{
+		// 				BOARD_STATE[i][j] = CellElements.EMPTY;
+		// 			}
+		// 		}
+			
+			
+		// 	}
+		// }
+
 		boolean rowOffset = false;
 		for (int h = 0; h < BOARD_HEIGHT; ++h) {
 			for (int w = 0; w < BOARD_WIDTH; ++w) {
@@ -75,6 +117,8 @@ public class Board {
 			}
 			rowOffset = !rowOffset;
 		}
+	
+	
 	}
 
 	public void displayBoard() {

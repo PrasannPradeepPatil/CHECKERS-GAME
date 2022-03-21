@@ -9,7 +9,7 @@ public class Main {
 	1. Move diagonally 1 space
 	2. Move diagonally over opponets goti onto an empty space
 	3. Move diagonally over opponets goti onto an empty space and again move diagonally over opponents goti to empty space 
-	4. If there is a jump you must jump r
+	4. If there is a jump you must jump 
 	*/
 
 
