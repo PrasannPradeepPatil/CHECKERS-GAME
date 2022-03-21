@@ -1,9 +1,9 @@
 public class Player {
 
 	private final String PLAYER_NAME;
-	private final CellElements PLAYER_COLOR;
+	private final CellState PLAYER_COLOR;
 
-	public Player(final String name, final CellElements color) {
+	public Player(final String name, final CellState color) {
 		this.PLAYER_NAME = name;
 		this.PLAYER_COLOR = color;
 	}
@@ -12,7 +12,7 @@ public class Player {
 		return this.PLAYER_NAME;
 	}
 
-	public CellElements getColor() {
+	public CellState getColor() {
 		return this.PLAYER_COLOR;
 	}
 }

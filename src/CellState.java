@@ -1,11 +1,11 @@
-public enum CellElements {
+public enum CellState {
 	RED('r'), 
 	WHITE('w'), 
 	EMPTY('-');
 
 	private final char SYMBOL;
 
-	CellElements(char symbol) {
+	CellState(char symbol) {
 		this.SYMBOL = symbol;
 	}
 

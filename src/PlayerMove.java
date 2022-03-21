@@ -1,18 +1,18 @@
 public class PlayerMove {
 
-	public int startX;
-	public int startY;
-	public int endX;
-	public int endY;
+	public int sourceX;
+	public int sourceY;
+	public int destinationX;
+	public int destinationY;
 
 	public boolean playerJumped = false;
 	public int capturedX = -1;
 	public int capturedY = -1;
 
-	public PlayerMove(int startX,int startY, int endX,final int endY) {
-		this.startX = startX;
-		this.startY = startY;
-		this.endX = endX;
-		this.endY = endY;
+	public PlayerMove(int sourceX,int sourceY, int destinationX,final int destinationY) {
+		this.sourceX = sourceX;
+		this.sourceY = sourceY;
+		this.destinationX = destinationX;
+		this.destinationY = destinationY;
 	}
 }

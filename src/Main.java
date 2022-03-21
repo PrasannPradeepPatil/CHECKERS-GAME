@@ -16,8 +16,8 @@ public class Main {
 	public static void main(String[] args) {
 
 		// Create red and white player				
-		Player redPlayer = new Player("red", CellElements.RED);
-		Player whitePlayer = new Player("white", CellElements.WHITE);
+		Player redPlayer = new Player("red", CellState.RED);
+		Player whitePlayer = new Player("white", CellState.WHITE);
 
 		// Create and display the checkers board.
 		Board board = new Board(redPlayer, whitePlayer);
@@ -26,8 +26,7 @@ public class Main {
 
 		// Begin prompting players for moves until the game ends.
 		while (board.isGameRunning()) {
-			Scanner scanner = new Scanner(System.in);
-			board.promptPlayerMove(scanner);
+			board.currentPlayerMoveDetails();
 			board.displayBoard();
 		}
 	}
