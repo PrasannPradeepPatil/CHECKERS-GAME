@@ -1,9 +1,8 @@
 
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import javax.swing.*;
+import java.net.PortUnreachableException;
+import java.util.*;
 
 /**
  * This class contains the state of the checkers board, as well as methods for
@@ -23,8 +22,9 @@ public class Board {
 
 	private final Player[] PLAYERS;
 	private final List<PlayerMove> CURRENT_PLAYER_MOVES;
-	private List<Integer[]> JUMPERS = new ArrayList<>();
+	private List<Integer[]> jumpPositions = new ArrayList<>();
 	private int CURRENT_PLAYER = 0;
+	private List<PiecePosition>[] piecePositionInfoArray= new List[2];
 
 	public Board(final Player red, final Player white) {
 		BOARD_STATE = new CellElements[BOARD_WIDTH][BOARD_HEIGHT];
@@ -32,91 +32,60 @@ public class Board {
 		PLAYERS[0] = red;
 		PLAYERS[1] = white;
 		CURRENT_PLAYER_MOVES = new ArrayList<PlayerMove>();
+		Arrays.setAll(piecePositionInfoArray, element -> new ArrayList<>());
+
 		resetGame();
 	}
 
 
-	private void resetGame() {
-		// for(int i=0 ; i <=BOARD_HEIGHT -1;i++){
-		// 	for(int j=0 ; j <= BOARD_WIDTH-1;j++){
-		// 		if(i == 0 || i == 2){
-		// 			if(j%2 != 0){
-		// 				BOARD_STATE[i][j] = CellElements.WHITE;
-		// 			}
-		// 			else{
-		// 				BOARD_STATE[i][j] = CellElements.EMPTY;
-		// 			}
-		// 		}
-		// 	    else if(i == 1){
-		// 			if(j%2 == 0){
-		// 				BOARD_STATE[i][j] = CellElements.WHITE;
-		// 			}
-		// 			else{
-		// 				BOARD_STATE[i][j] = CellElements.EMPTY;
-		// 			}
-		// 		}
-		// 		else if(i == 3 || i == 4){
-		// 			BOARD_STATE[i][j]  = CellElements.EMPTY;
-		// 		}
-		// 		else if(i == 5 || i == 7){
-		// 			if(j %2 == 0){
-		// 				BOARD_STATE[i][j] = CellElements.RED;
-		// 			}
-		// 			else{
-		// 				BOARD_STATE[i][j] = CellElements.EMPTY;
-		// 			}
-		// 		}
-		// 	    else if(i == 6){
-		// 			if(j %2 != 0){
-		// 				BOARD_STATE[i][j] = CellElements.RED;
-		// 			}
-		// 			else{
-		// 				BOARD_STATE[i][j] = CellElements.EMPTY;
-		// 			}
-		// 		}
-			
-			
-		// 	}
-		// }
 
-		boolean rowOffset = false;
-		for (int h = 0; h < BOARD_HEIGHT; ++h) {
-			for (int w = 0; w < BOARD_WIDTH; ++w) {
-
-				if (h < 3) {
-					if (rowOffset) {
-						if (w % 2 == 0) {
-							BOARD_STATE[w][h] = CellElements.WHITE;
-						} else {
-							BOARD_STATE[w][h] = CellElements.EMPTY;
+		private void resetGame() {
+			for(int i=0 ; i <=BOARD_HEIGHT -1;i++){
+				for(int j=0 ; j <= BOARD_WIDTH-1;j++){
+					if(i == 0 || i == 2){
+						if(j%2 != 0){
+							BOARD_STATE[j][i] = CellElements.WHITE;
+							piecePositionInfoArray[0].add(new PiecePosition(j,BOARD_HEIGHT -1 - i));
 						}
-					} else {
-						if (w % 2 != 0) {
-							BOARD_STATE[w][h] = CellElements.WHITE;
-						} else {
-							BOARD_STATE[w][h] = CellElements.EMPTY;
+						else{
+							BOARD_STATE[j][i] = CellElements.EMPTY;
 						}
 					}
-				} else if (h < 5) {
-					BOARD_STATE[w][h] = CellElements.EMPTY;
-				} else {
-					if (rowOffset) {
-						if (w % 2 == 0) {
-							BOARD_STATE[w][h] = CellElements.RED;
-						} else {
-							BOARD_STATE[w][h] = CellElements.EMPTY;
+					else if(i == 1){
+						if(j%2 == 0){
+							BOARD_STATE[j][i] = CellElements.WHITE;
+							piecePositionInfoArray[0].add(new PiecePosition(j,BOARD_HEIGHT -1 - i));
 						}
-					} else {
-						if (w % 2 != 0) {
-							BOARD_STATE[w][h] = CellElements.RED;
-						} else {
-							BOARD_STATE[w][h] = CellElements.EMPTY;
+						else{
+							BOARD_STATE[j][i] = CellElements.EMPTY;
 						}
 					}
+					else if(i == 3 || i == 4){
+						BOARD_STATE[j][i]  = CellElements.EMPTY;
+					}
+					else if(i == 5 || i == 7){
+						if(j %2 == 0){
+							BOARD_STATE[j][i] = CellElements.RED;
+							piecePositionInfoArray[1].add(new PiecePosition(j,BOARD_HEIGHT -1 - i));
+						}
+						else{
+							BOARD_STATE[j][i] = CellElements.EMPTY;
+						}
+					}
+					else if(i == 6){
+						if(j %2 != 0){
+							BOARD_STATE[j][i] = CellElements.RED;
+							piecePositionInfoArray[1].add(new PiecePosition(j,BOARD_HEIGHT -1 - i));
+						}
+						else{
+							BOARD_STATE[j][i] = CellElements.EMPTY;
+						}
+					}
+
+
 				}
 			}
-			rowOffset = !rowOffset;
-		}
+
 	
 	
 	}
@@ -144,11 +113,57 @@ public class Board {
 
 
 	public boolean isGameRunning() {
-		return true;
+//		return true;
 
 		// TODO: this is where I ran out of time.
 		// I would check, for the player whose turn it is, whether any of their
 		// pieces have valid moves. If not, then the game must be over.
+		Player currentPlayer = PLAYERS[CURRENT_PLAYER];
+		int playerNo = 0;
+		int directionModifier = -1;
+
+		if(currentPlayer.getColor() == CellElements.RED) {
+			playerNo = 1;
+			directionModifier = 1;
+		}
+
+		int count = 0;
+
+//		int directionModifier = currentPlayer.getColor() == CellElements.RED ? 1 : -1;
+
+
+		for(PiecePosition piecePosition: piecePositionInfoArray[playerNo])
+		{
+			int targetOneX = piecePosition.xCoordinate - 1;
+			int targetTwoX = piecePosition.xCoordinate + 1;
+			int targetThreeX = piecePosition.xCoordinate - 2;
+			int targetFourX = piecePosition.xCoordinate + 2;
+			int targetY = piecePosition.yCoordinate +  directionModifier;
+			int targetJumpY = piecePosition.yCoordinate +  (2*directionModifier);
+
+
+			String targetOne = piecePosition.xCoordinate  + "," + (piecePosition.yCoordinate) + ";" + targetOneX + ","
+					+ targetY;
+			String targetTwo = piecePosition.xCoordinate  + "," + (piecePosition.yCoordinate) + ";" + targetTwoX + ","
+					+ targetY;
+			String targetThree = piecePosition.xCoordinate  + "," + ( piecePosition.yCoordinate) + ";" + targetThreeX + ","
+					+ targetJumpY;
+			String targetFour = piecePosition.xCoordinate  + "," + (piecePosition.yCoordinate) + ";" + targetFourX + ","
+					+ targetJumpY;
+			Optional<PlayerMove> targetOneOption = parseValidMove(targetOne);
+			Optional<PlayerMove> targetTwoOption = parseValidMove(targetTwo);
+			Optional<PlayerMove> targetThreeOption = parseValidMove(targetThree);
+			Optional<PlayerMove> targetFourOption = parseValidMove(targetFour);
+
+			if ((targetOneOption.isPresent() || targetTwoOption.isPresent() || targetThreeOption.isPresent() || targetFourOption.isPresent()))
+			{
+				return true;
+			}
+		}
+
+
+		return false;
+
 	}
 
 	public void promptPlayerMove(Scanner prompt) {
@@ -163,7 +178,7 @@ public class Board {
 		// If the player has a piece that can jump, they must choose
 		// that piece. Find all of the player's pieces which have
 		// eligible jumps.
-		JUMPERS.clear();
+		jumpPositions.clear();
 		for (int w = 0; w < BOARD_WIDTH; ++w) {
 			for (int h = 0; h < BOARD_HEIGHT; ++h) {
 				CellElements tile = BOARD_STATE[w][h];
@@ -173,7 +188,7 @@ public class Board {
 						Integer[] jumpPosition = new Integer[2];
 						jumpPosition[0] = w;
 						jumpPosition[1] = (7 - h);
-						JUMPERS.add(jumpPosition);
+						jumpPositions.add(jumpPosition);
 					}
 				}
 			}
@@ -270,6 +285,17 @@ public class Board {
 		CellElements piece = BOARD_STATE[startX][(BOARD_HEIGHT - 1) - startY];
 		this.BOARD_STATE[endX][(BOARD_HEIGHT - 1) - endY] = piece;
 		this.BOARD_STATE[startX][(BOARD_HEIGHT - 1) - startY] = CellElements.EMPTY;
+		PiecePosition currentPiecePos = new PiecePosition(startX, startY);
+		if(piece == CellElements.WHITE)
+		{
+			piecePositionInfoArray[0].add(new PiecePosition(endX, endY));
+			piecePositionInfoArray[0].remove(currentPiecePos);
+		}
+		else
+		{
+			piecePositionInfoArray[1].add(new PiecePosition(endX, endY));
+			piecePositionInfoArray[1].remove(currentPiecePos);
+		}
 
 		// Remove whatever piece it might have killed.
 		boolean playerJumped = move.playerJumped;
@@ -278,6 +304,16 @@ public class Board {
 			int capturedY = move.capturedY;
 			this.BOARD_STATE[capturedX][(BOARD_HEIGHT - 1)
 					- capturedY] = CellElements.EMPTY;
+			PiecePosition capturedPiecePos = new PiecePosition(capturedX, capturedY);
+
+			if(piece == CellElements.WHITE)
+			{
+				piecePositionInfoArray[0].remove(capturedPiecePos);
+			}
+			else
+			{
+				piecePositionInfoArray[1].remove(capturedPiecePos);
+			}
 		}
 	}
 
@@ -285,13 +321,8 @@ public class Board {
 	private boolean canPieceJump(int pieceX, int pieceY) {
 
 		Player currentPlayer = PLAYERS[CURRENT_PLAYER];
-		CellElements playerColor = currentPlayer.getColor();
-		int directionModifier = 0;
-		if (playerColor == CellElements.RED) {
-			directionModifier = 1;
-		} else {
-			directionModifier = -1;
-		}
+		int directionModifier = currentPlayer.getColor() == CellElements.RED ? 1 : -1;
+
 
 		int targetOneX = pieceX - 2;
 		int targetTwoX = pieceX + 2;
@@ -310,16 +341,13 @@ public class Board {
 
 		// Check if the input can split into two cells.
 		String[] splitMove = moveString.split(";");
-		if (splitMove.length != 2) {
+		if (splitMove.length != 2 || (splitMove[0]).split(",").length !=2 || (splitMove[1]).split(",").length !=2) {
 			return Optional.empty();
 		}
 
 		// Check if the two cells can split into two coordinates.
 		String[] cellFrom = (splitMove[0]).split(",");
 		String[] cellTo = (splitMove[1]).split(",");
-		if (cellFrom.length != 2 || cellTo.length != 2) {
-			return Optional.empty();
-		}
 
 		// Check if the cell coordinates can be properly parsed.
 		try {
@@ -425,9 +453,9 @@ public class Board {
 
 					// If we found jump-capable pieces, is this one?
 					// And did it jump?
-					if (JUMPERS.size() > 0) {
+					if (jumpPositions.size() > 0) {
 						boolean wasJumper = false;
-						for (Integer[] position : JUMPERS) {
+						for (Integer[] position : jumpPositions) {
 							int posX = position[0];
 							int posY = position[1];
 							if (posX == startX && posY == startY) {
