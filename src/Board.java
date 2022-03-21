@@ -17,121 +17,66 @@ public class Board {
 
 
 	
-	private final int BOARD_WIDTH = 8;
-	private final int BOARD_HEIGHT = 8;
-	private final CellElements[][] BOARD_STATE ;
+	private final int totalColumns = 8;
+	private final int totalRows = 8;
+	private final CellElements[][] board ;
 
-	private final Player[] PLAYERS;
-	private final List<PlayerMove> CURRENT_PLAYER_MOVES;
+	private final Player[] players;
+	private final List<PlayerMove> currentPlayerMoves;
 	private List<Integer[]> JUMPERS = new ArrayList<>();
-	private int CURRENT_PLAYER = 0;
+	private int currentPlayerIndex = 0;
 
 	public Board(final Player red, final Player white) {
-		BOARD_STATE = new CellElements[BOARD_WIDTH][BOARD_HEIGHT];
-		PLAYERS = new Player[2];
-		PLAYERS[0] = red;
-		PLAYERS[1] = white;
-		CURRENT_PLAYER_MOVES = new ArrayList<PlayerMove>();
-		resetGame();
+		board = new CellElements[totalColumns][totalRows];
+		players = new Player[2];
+		players[0] = red;
+		players[1] = white;
+		currentPlayerMoves = new ArrayList<PlayerMove>();
+		resetBoard();
 	}
 
-
-	private void resetGame() {
-		// for(int i=0 ; i <=BOARD_HEIGHT -1;i++){
-		// 	for(int j=0 ; j <= BOARD_WIDTH-1;j++){
-		// 		if(i == 0 || i == 2){
-		// 			if(j%2 != 0){
-		// 				BOARD_STATE[i][j] = CellElements.WHITE;
-		// 			}
-		// 			else{
-		// 				BOARD_STATE[i][j] = CellElements.EMPTY;
-		// 			}
-		// 		}
-		// 	    else if(i == 1){
-		// 			if(j%2 == 0){
-		// 				BOARD_STATE[i][j] = CellElements.WHITE;
-		// 			}
-		// 			else{
-		// 				BOARD_STATE[i][j] = CellElements.EMPTY;
-		// 			}
-		// 		}
-		// 		else if(i == 3 || i == 4){
-		// 			BOARD_STATE[i][j]  = CellElements.EMPTY;
-		// 		}
-		// 		else if(i == 5 || i == 7){
-		// 			if(j %2 == 0){
-		// 				BOARD_STATE[i][j] = CellElements.RED;
-		// 			}
-		// 			else{
-		// 				BOARD_STATE[i][j] = CellElements.EMPTY;
-		// 			}
-		// 		}
-		// 	    else if(i == 6){
-		// 			if(j %2 != 0){
-		// 				BOARD_STATE[i][j] = CellElements.RED;
-		// 			}
-		// 			else{
-		// 				BOARD_STATE[i][j] = CellElements.EMPTY;
-		// 			}
-		// 		}
-			
-			
-		// 	}
-		// }
-
-		boolean rowOffset = false;
-		for (int h = 0; h < BOARD_HEIGHT; ++h) {
-			for (int w = 0; w < BOARD_WIDTH; ++w) {
-
-				if (h < 3) {
-					if (rowOffset) {
-						if (w % 2 == 0) {
-							BOARD_STATE[w][h] = CellElements.WHITE;
-						} else {
-							BOARD_STATE[w][h] = CellElements.EMPTY;
-						}
-					} else {
-						if (w % 2 != 0) {
-							BOARD_STATE[w][h] = CellElements.WHITE;
-						} else {
-							BOARD_STATE[w][h] = CellElements.EMPTY;
-						}
+	private void resetBoard() {
+		for(int i=0 ; i <=totalRows -1;i++){
+			for(int j=0 ; j <= totalColumns-1;j++){
+				if(i == 0 || i == 2){
+					if(j%2 != 0){
+						board[j][i] = CellElements.WHITE;
 					}
-				} else if (h < 5) {
-					BOARD_STATE[w][h] = CellElements.EMPTY;
-				} else {
-					if (rowOffset) {
-						if (w % 2 == 0) {
-							BOARD_STATE[w][h] = CellElements.RED;
-						} else {
-							BOARD_STATE[w][h] = CellElements.EMPTY;
-						}
-					} else {
-						if (w % 2 != 0) {
-							BOARD_STATE[w][h] = CellElements.RED;
-						} else {
-							BOARD_STATE[w][h] = CellElements.EMPTY;
-						}
+					else{
+						board[j][i] = CellElements.EMPTY;
 					}
 				}
+			    else if(i == 1){
+					if(j%2 == 0){
+						board[j][i] = CellElements.WHITE;
+					}
+					else{
+						board[j][i] = CellElements.EMPTY;
+					}
+				}
+				else if(i == 3 || i == 4){
+					board[j][i]  = CellElements.EMPTY;
+				}
+				else if(i == 5 || i == 7){
+					if(j %2 == 0){
+						board[j][i] = CellElements.RED;
+					}
+					else{
+						board[j][i] = CellElements.EMPTY;
+					}
+				}
+			    else if(i == 6){
+					if(j %2 != 0){
+						board[j][i] = CellElements.RED;
+					}
+					else{
+						board[j][i] = CellElements.EMPTY;
+					}
+				}
+			
+			
 			}
-			rowOffset = !rowOffset;
-		}
-	
-	
-	}
-
-	public void displayBoard() {
-		for (int i = 0; i <= BOARD_HEIGHT-1; i++) {
-		    
-			System.out.print(BOARD_HEIGHT - i -1  + " " +  "|");
-			for (int j = 0; j <= BOARD_WIDTH-1; j++) {
-				CellElements tile = BOARD_STATE[j][i];
-				System.out.print(tile.getSymbol() + "|");
-			}
-			System.out.print("\n");
-		}
-		System.out.println("   0 1 2 3 4 5 6 7");
+		}	
 	}
 
 	public void displayInputDetails(){
@@ -142,19 +87,24 @@ public class Board {
 							);
 	}
 
-
-	public boolean isGameRunning() {
-		return true;
-
-		// TODO: this is where I ran out of time.
-		// I would check, for the player whose turn it is, whether any of their
-		// pieces have valid moves. If not, then the game must be over.
+	public void displayBoard() {
+		for (int i = 0; i <= totalRows-1; i++) {
+		    
+			System.out.print(totalRows - i -1  + " " +  "|");
+			for (int j = 0; j <= totalColumns-1; j++) {
+				CellElements tile = board[j][i];
+				System.out.print(tile.getSymbol() + "|");
+			}
+			System.out.print("\n");
+		}
+		System.out.println("   0 1 2 3 4 5 6 7");
 	}
+
 
 	public void promptPlayerMove(Scanner prompt) {
 
 		// Tell the players who we're asking input from.
-		Player currentPlayer = PLAYERS[CURRENT_PLAYER];
+		Player currentPlayer = players[currentPlayerIndex];
 		CellElements playerColor = currentPlayer.getColor();
 		String currentPlayerName = currentPlayer.getName();
 		System.out.println("It is " + currentPlayer.getName()
@@ -164,9 +114,9 @@ public class Board {
 		// that piece. Find all of the player's pieces which have
 		// eligible jumps.
 		JUMPERS.clear();
-		for (int w = 0; w < BOARD_WIDTH; ++w) {
-			for (int h = 0; h < BOARD_HEIGHT; ++h) {
-				CellElements tile = BOARD_STATE[w][h];
+		for (int w = 0; w < totalColumns; ++w) {
+			for (int h = 0; h < totalRows; ++h) {
+				CellElements tile = board[w][h];
 				if (playerColor == tile) {
 					boolean canJump = this.canPieceJump(w, 7 - h);
 					if (canJump) {
@@ -210,12 +160,12 @@ public class Board {
 		}
 
 		// Pass control of next turn to the other player.
-		swapPlayerControl();
-		CURRENT_PLAYER_MOVES.clear();
+		swapPlayerIndex();
+		currentPlayerMoves.clear();
 	}
 
-	protected void swapPlayerControl() {
-		CURRENT_PLAYER = (1 - CURRENT_PLAYER);
+	private void swapPlayerIndex() {
+		currentPlayerIndex = (currentPlayerIndex == 1)?0:1;
 	}
 
 	private boolean hasFollowUpMoves(PlayerMove move) {
@@ -224,7 +174,7 @@ public class Board {
 		if (move.playerJumped) {
 
 			// Find the two possible locations this piece could still jump to.
-			Player currentPlayer = PLAYERS[CURRENT_PLAYER];
+			Player currentPlayer = players[currentPlayerIndex];
 			CellElements playerColor = currentPlayer.getColor();
 			int directionModifier = 0;
 			if (playerColor == CellElements.RED) {
@@ -247,11 +197,11 @@ public class Board {
 
 			boolean availableMoves = false;
 			if (targetOneOption.isPresent()) {
-				CURRENT_PLAYER_MOVES.add(targetOneOption.get());
+				currentPlayerMoves.add(targetOneOption.get());
 				availableMoves = true;
 			}
 			if (targetTwoOption.isPresent()) {
-				CURRENT_PLAYER_MOVES.add(targetTwoOption.get());
+				currentPlayerMoves.add(targetTwoOption.get());
 				availableMoves = true;
 			}
 			return availableMoves;
@@ -267,16 +217,16 @@ public class Board {
 		int endY = move.endY;
 
 		// Move the piece to its new location.
-		CellElements piece = BOARD_STATE[startX][(BOARD_HEIGHT - 1) - startY];
-		this.BOARD_STATE[endX][(BOARD_HEIGHT - 1) - endY] = piece;
-		this.BOARD_STATE[startX][(BOARD_HEIGHT - 1) - startY] = CellElements.EMPTY;
+		CellElements piece = board[startX][(totalRows - 1) - startY];
+		this.board[endX][(totalRows - 1) - endY] = piece;
+		this.board[startX][(totalRows - 1) - startY] = CellElements.EMPTY;
 
 		// Remove whatever piece it might have killed.
 		boolean playerJumped = move.playerJumped;
 		if (playerJumped) {
 			int capturedX = move.capturedX;
 			int capturedY = move.capturedY;
-			this.BOARD_STATE[capturedX][(BOARD_HEIGHT - 1)
+			this.board[capturedX][(totalRows - 1)
 					- capturedY] = CellElements.EMPTY;
 		}
 	}
@@ -284,7 +234,7 @@ public class Board {
 	// Checks whether or not the piece at position x,y can jump.
 	private boolean canPieceJump(int pieceX, int pieceY) {
 
-		Player currentPlayer = PLAYERS[CURRENT_PLAYER];
+		Player currentPlayer = players[currentPlayerIndex];
 		CellElements playerColor = currentPlayer.getColor();
 		int directionModifier = 0;
 		if (playerColor == CellElements.RED) {
@@ -328,7 +278,7 @@ public class Board {
 			int endX = Integer.parseInt(cellTo[0]);
 			int endY = Integer.parseInt(cellTo[1]);
 
-			Player currentPlayer = PLAYERS[CURRENT_PLAYER];
+			Player currentPlayer = players[currentPlayerIndex];
 			CellElements playerColor = currentPlayer.getColor();
 
 			// Check to see if these coordinates are valid on the board.
@@ -341,14 +291,14 @@ public class Board {
 					// Make sure this player is trying to move their own piece.
 					// The offset value is to translate the origin for the
 					// players. They would expect 0,0 to be bottom-left.
-					CellElements movingPiece = BOARD_STATE[startX][(BOARD_HEIGHT
+					CellElements movingPiece = board[startX][(totalRows
 							- 1) - startY];
 					if (playerColor != movingPiece) {
 						return Optional.empty();
 					}
 
 					// Make sure this player is trying to move to an empty spot.
-					CellElements destination = BOARD_STATE[endX][(BOARD_HEIGHT - 1)
+					CellElements destination = board[endX][(totalRows - 1)
 							- endY];
 					if (destination != CellElements.EMPTY) {
 						return Optional.empty();
@@ -395,7 +345,7 @@ public class Board {
 						}
 
 						// Actually perform the check to see opponent state.
-						CellElements opponentPiece = BOARD_STATE[opponentX][(BOARD_HEIGHT
+						CellElements opponentPiece = board[opponentX][(totalRows
 								- 1) - opponentY];
 						if ((playerColor == CellElements.RED
 								&& opponentPiece != CellElements.WHITE)
@@ -414,7 +364,7 @@ public class Board {
 					// that's not directly in the jump's chain. We need to
 					// restrict their valid moves in this case.
 					boolean isValidOption = false;
-					for (PlayerMove m : CURRENT_PLAYER_MOVES) {
+					for (PlayerMove m : currentPlayerMoves) {
 						int mX = m.endX;
 						int mY = m.endY;
 						if (endX == mX && endY == mY) {
@@ -446,7 +396,7 @@ public class Board {
 					// move, or it's part of a jump chain. If they're trying to
 					// cheat their way out of a jump chain, then this is not a
 					// valid move.
-					if (CURRENT_PLAYER_MOVES.size() == 0 || isValidOption) {
+					if (currentPlayerMoves.size() == 0 || isValidOption) {
 						return Optional.of(validMove);
 					} else {
 						return Optional.empty();
@@ -460,4 +410,16 @@ public class Board {
 		// This input failed to parse into a valid move.
 		return Optional.empty();
 	}
+
+	public boolean isGameRunning() {
+		return true;
+
+		// TODO: this is where I ran out of time.
+		// I would check, for the player whose turn it is, whether any of their
+		// pieces have valid moves. If not, then the game must be over.
+	}
+
+
+
+
 }
