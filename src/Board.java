@@ -73,8 +73,7 @@ public class Board {
 			}
 		}
 
-        //return false;   
-		return true;
+		return false;
 	}
 
 	private void resetBoard() {
@@ -83,7 +82,7 @@ public class Board {
 				if(i == 0 || i == 2){
 					if(j%2 != 0){
 						board[j][i] = CellState.WHITE;
-						piecePositionInfoArray[0].add(new PiecePosition(j,i));
+						piecePositionInfoArray[0].add(new PiecePosition(j,totalRows -1 - i));
 					}
 					else{
 						board[j][i] = CellState.EMPTY;
@@ -92,7 +91,7 @@ public class Board {
 			    else if(i == 1){
 					if(j%2 == 0){
 						board[j][i] = CellState.WHITE;
-						piecePositionInfoArray[0].add(new PiecePosition(j,i));
+						piecePositionInfoArray[0].add(new PiecePosition(j,totalRows -1 - i));
 					}
 					else{
 						board[j][i] = CellState.EMPTY;
@@ -104,7 +103,7 @@ public class Board {
 				else if(i == 5 || i == 7){
 					if(j %2 == 0){
 						board[j][i] = CellState.RED;
-						piecePositionInfoArray[1].add(new PiecePosition(j,i));
+						piecePositionInfoArray[1].add(new PiecePosition(j,totalRows -1 - i));
 					}
 					else{
 						board[j][i] = CellState.EMPTY;
@@ -113,7 +112,7 @@ public class Board {
 			    else if(i == 6){
 					if(j %2 != 0){
 						board[j][i] = CellState.RED;
-						piecePositionInfoArray[1].add(new PiecePosition(j,i));
+						piecePositionInfoArray[1].add(new PiecePosition(j,totalRows -1 - i));
 					}
 					else{
 						board[j][i] = CellState.EMPTY;
