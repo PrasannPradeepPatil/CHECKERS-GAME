@@ -206,9 +206,7 @@ public class Board {
 					}
 
 					// Make sure we moved in the right direction.
-					if (expectedY != destinationY) {
-						return Optional.empty();
-					}
+					if (expectedY != destinationY) {return Optional.empty();}
 
 					// If this is a jump, make sure we actually playerJumped over an
 					// opponent's piece.
