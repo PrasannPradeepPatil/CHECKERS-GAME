@@ -37,21 +37,14 @@ public class Board {
 
 
 	public boolean isGameRunning() {
-//		return true;
-
-		// TODO: this is where I ran out of time.
-		// I would check, for the player whose turn it is, whether any of their
-		// pieces have valid moves. If not, then the game must be over.
-		Player currentPlayer = PLAYERS[CURRENT_PLAYER];
+		Player currentPlayer = players[currentPlayerIndex];
 		int playerNo = 0;
 		int directionModifier = -1;
 
-		if (currentPlayer.getColor() == CellElements.RED) {
+		if (currentPlayer.getColor() == CellState.RED) {
 			playerNo = 1;
 			directionModifier = 1;
 		}
-
-		int count = 0;
 
 		for (PiecePosition piecePosition : piecePositionInfoArray[playerNo]) {
 			int targetOneX = piecePosition.xCoordinate - 1;
@@ -151,18 +144,21 @@ public class Board {
 		String currentPlayerName = currentPlayer.getName();
 		System.out.println("Please input " + currentPlayer.getName()+ "'s move");
 
+		int playerNo = 0;
+
+		if (currentPlayer.getColor() == CellState.RED)
+		{
+			playerNo = 1;
+		}
+
 
 		//For all of the current players peice find all peices which have valid jumps(if a peice can jump it has to jump)
 		availableJumpPositions.clear();
-		for (int i = 0; i <= totalColumns-1; i++) {
-			for (int j = 0; j <= totalRows-1; j++) {
-				CellState cellColour = board[i][j];
-				if (currentPlayerColour == cellColour) {
-					boolean currentPeiceCanJump = this.currentPeiceCanJump(i, 7 - j);
-					if (currentPeiceCanJump) {
-						availableJumpPositions.add(new int[]{i,7-j});
-					}
-				}
+		for (PiecePosition piecePosition : piecePositionInfoArray[playerNo])
+		{
+			boolean currentPieceCanJump = this.currentPeiceCanJump(piecePosition.xCoordinate, piecePosition.yCoordinate);
+			if (currentPieceCanJump) {
+				availableJumpPositions.add(new int[]{piecePosition.xCoordinate,piecePosition.yCoordinate});
 			}
 		}
 
@@ -195,8 +191,7 @@ public class Board {
 		// swap the player
 		currentPlayerIndex = (currentPlayerIndex == 1)?0:1;
 		currentPlayerMoves.clear();
-
-
+		availableJumpPositions.clear();
 	}
 
 	private Optional<PlayerMove> parseValidMove(String moveString) {
@@ -423,20 +418,5 @@ public class Board {
 
 		return (destination_1_Move.isPresent() || destination_2_Move.isPresent());
 	}
-
-
-
-
-
-	public boolean isGameRunning() {
-		return true;
-
-		// TODO: this is where I ran out of time.
-		// I would check, for the player whose turn it is, whether any of their
-		// pieces have valid moves. If not, then the game must be over.
-	}
-
-
-
 
 }
