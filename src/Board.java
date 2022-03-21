@@ -83,6 +83,7 @@ public class Board {
 				if(i == 0 || i == 2){
 					if(j%2 != 0){
 						board[j][i] = CellState.WHITE;
+						piecePositionInfoArray[0].add(new PiecePosition(j,i));
 					}
 					else{
 						board[j][i] = CellState.EMPTY;
@@ -91,6 +92,7 @@ public class Board {
 			    else if(i == 1){
 					if(j%2 == 0){
 						board[j][i] = CellState.WHITE;
+						piecePositionInfoArray[0].add(new PiecePosition(j,i));
 					}
 					else{
 						board[j][i] = CellState.EMPTY;
@@ -102,6 +104,7 @@ public class Board {
 				else if(i == 5 || i == 7){
 					if(j %2 == 0){
 						board[j][i] = CellState.RED;
+						piecePositionInfoArray[1].add(new PiecePosition(j,i));
 					}
 					else{
 						board[j][i] = CellState.EMPTY;
@@ -110,6 +113,7 @@ public class Board {
 			    else if(i == 6){
 					if(j %2 != 0){
 						board[j][i] = CellState.RED;
+						piecePositionInfoArray[1].add(new PiecePosition(j,i));
 					}
 					else{
 						board[j][i] = CellState.EMPTY;
@@ -388,12 +392,22 @@ public class Board {
 		this.board[destinationX][(totalRows - 1) - destinationY] = piece;
 		this.board[sourceX][(totalRows - 1) - sourceY] = CellState.EMPTY;
 
+		int playerNo = 0;
+		if(piece == CellState.RED)
+		{
+			playerNo = 1;
+		}
+
+		piecePositionInfoArray[playerNo].add(new PiecePosition(destinationX, destinationY));
+		piecePositionInfoArray[playerNo].remove(new PiecePosition(sourceX, sourceY));
+
 		// Remove the captures peice when player moves
 		boolean playerJumped = move.playerJumped;
 		if (playerJumped) {
 			int capturedX = move.capturedX;
 			int capturedY = move.capturedY;
 			this.board[capturedX][(totalRows - 1)- capturedY] = CellState.EMPTY;
+			piecePositionInfoArray[playerNo].remove(new PiecePosition(capturedX, capturedY));
 		}
 	}
 
