@@ -25,7 +25,7 @@ public class Main {
 		board.displayBoard();
 
 		// Begin prompting players for moves until the game ends.
-		while (board.isGameRunning()) {
+		while (board.isAnyMoveValid()) {
 			board.currentPlayerMoveDetails();
 			board.displayBoard();
 		}

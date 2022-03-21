@@ -36,7 +36,7 @@ public class Board {
 	}
 
 
-	public boolean isGameRunning() {
+	public boolean isAnyMoveValid() {
 		Player currentPlayer = players[currentPlayerIndex];
 		int playerNo = 0;
 		int directionModifier = -1;
@@ -73,8 +73,8 @@ public class Board {
 			}
 		}
 
-
-		return false;
+        //return false;   
+		return true;
 	}
 
 	private void resetBoard() {
